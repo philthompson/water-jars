@@ -15,6 +15,7 @@ const verticalPaddingPct = 0.2;
 
 const jars = [];
 var gapPixels = 0;
+var maxJarPixWidth = 0;
 
 const animFrames = 30;
 var animTimeout = null;
@@ -100,6 +101,8 @@ var resizeJars = function() {
 	const totalWidth = totalWidthUnscaled * scale;
 	gapPixels = (canvas.width - totalWidth) / (jars.length + 1);
 	var offsetXPixels = 0;
+	// reset global var
+	maxJarWidth = 0;
 	for (let i = 0; i < jars.length; i++) {
 		offsetXPixels += gapPixels;
 		const pixels = calculateJarPixelDimensions(scale, jars[i].r);
@@ -107,6 +110,9 @@ var resizeJars = function() {
 		jars[i]["leftX"] = offsetXPixels;
 		jars[i]["rightX"] = offsetXPixels + jars[i].wPixels;
 		offsetXPixels += jars[i].wPixels;
+		if (jars[i].wPixels > maxJarWidth) {
+			maxJarWidth = jars[i].wPixels;
+		}
 	}
 };
 
@@ -140,15 +146,16 @@ function draw() {
 	ctx.fillRect(0,0,canvas.width, canvas.height);
 
 	const verticalPadding = canvas.height * verticalPaddingPct;
-	const ellipseHeight = verticalPadding / 6;
+	const ellipseHeightMax = verticalPadding / 6;
 	const textHeight = verticalPadding * 0.4;
-	
+
 	for (let i = 0; i < jars.length; i++) {
 		ctx.strokeStyle = glassColor;
 		ctx.lineWidth = 2;
 
 		const jarBottomY = canvas.height - verticalPadding;
 		const jarTopY = jarBottomY - jars[i].hPixels;
+		const ellipseHeight = (jars[i].wPixels / maxJarWidth) * ellipseHeightMax;
 
 		ctx.beginPath();
 		ctx.moveTo(jars[i].leftX, jarTopY);

@@ -25,7 +25,6 @@
         padding: 2%;
         margin: 0;
         z-index: 11;
-        color: #111;
         font-size: 1.5rem;
     }
     #menu {
@@ -92,6 +91,8 @@
     }
     .blue-bg {
         background-color: #75d7fe;
+    }
+    .blue-text {
         color: #001a94;
     }
     .blue-border {
@@ -169,20 +170,19 @@
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 100%;
     }
-    #capacity-1 {
-        grid-row: 1;
-        grid-column: 1;
+    #capacity div, #contents div {
+        position: relative;
+        top: -0.35rem;
         text-align: center;
+    }
+    #capacity-1 {
+        grid-column: 1;
     }
     #capacity-2 {
-        grid-row: 1;
         grid-column: 2;
-        text-align: center;
     }
     #capacity-3 {
-        grid-row: 1;
         grid-column: 3;
-        text-align: center;
     }
     #jars {
         grid-row: 2;
@@ -203,19 +203,13 @@
         grid-template-rows: 100%;
     }
     #contents-1 {
-        grid-row: 1;
         grid-column: 1;
-        text-align: center;
     }
     #contents-2 {
-        grid-row: 1;
         grid-column: 2;
-        text-align: center;
     }
     #contents-3 {
-        grid-row: 1;
         grid-column: 3;
-        text-align: center;
     }
     #right-very-bottom {
         grid-row: 5;
@@ -241,11 +235,11 @@
     <div id="menu-open-wrap">
         <span class="fixed-top-left-btn" id="help-menu-open"><kbd>?</kbd></span>
     </div>
-    <div id="menu">
+    <div id="menu" class="blue-text">
         <span style="position: fixed; right: 2.0rem; top: 2.0rem;" id="menu-close">×</span>
         <div id="menu-contents"></div>
     </div>
-    <div id="help-menu">
+    <div id="help-menu" class="blue-text">
         <span style="position: fixed; right: 2.0rem; top: 2.0rem;" id="help-menu-close">×</span>
         <p>
             Help/info content here.
@@ -255,7 +249,7 @@
         <div id="title" class="rounded white-text">
             ÷÷÷÷÷÷÷ Divide and Conquer ÷÷÷÷÷÷÷
         </div>
-        <div id="left-top" class="rounded blue-bg">
+        <div id="left-top" class="rounded blue-bg blue-text">
             <p>The problem: You have three jars of different
             sizes. The largest one is filled with water.
             Divide the water evenly between jars A and
@@ -266,7 +260,7 @@
             <p>To measure accurately, you must either fill a
             jar to the top, or empty out a jar.</p>
         </div>
-        <div id="left-bottom" class="rounded blue-bg">
+        <div id="left-bottom" class="rounded blue-bg blue-text">
             <div id="select-jars">
                 <p style="text-align: center;">Select jars</p>
                 <div id="select-jars-btns">
@@ -281,7 +275,7 @@
             <p style="text-align: center;" class="white-text">Capacity</p>
         </div>
         <div id="right-mid">
-            <div id="capacity" class="rounded white-bg blue-border">
+            <div id="capacity" class="rounded white-bg blue-border blue-text">
                 <div id="capacity-1">1</div>
                 <div id="capacity-2">2</div>
                 <div id="capacity-3">3</div>
@@ -289,7 +283,7 @@
             <div id="jars">
                 <canvas id="c"></canvas>
             </div>
-            <div id="contents" class="rounded white-bg blue-border">
+            <div id="contents" class="rounded white-bg blue-border blue-text">
                 <div id="contents-1">1</div>
                 <div id="contents-2">2</div>
                 <div id="contents-3">3</div>

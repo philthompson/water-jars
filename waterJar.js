@@ -3,6 +3,7 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 var resizeTimeout = null;
 
+const bgColor = "#511993";
 const glassColor = "rgba(220,220,255,1.0)";
 const waterLineColor = "rgba(120,120,255,0.7)";
 //const waterColor = "rgba(120,120,255,0.4)";
@@ -15,9 +16,13 @@ const verticalPaddingPct = 0.2;
 const jars = [];
 var gapPixels = 0;
 
+const animFrames = 30;
+var animTimeout = null;
+var animating = false;
+
 const games = [
 	{"id": "6-4-1", "minMoves": 3},
-	{"id": "8-5-3", "minMoves": 1},
+	{"id": "8-5-3", "minMoves": 7},
 	{"id": "12-7-4", "minMoves": 1},
 	{"id": "14-9-5", "minMoves": 1},
 	{"id": "16-10-3", "minMoves": 1}
@@ -131,12 +136,9 @@ function calculateJarPixelDimensions(scale, radiusUnscaled) {
 }
 
 function draw() {
-	// background might just be able to be transparent
-	ctx.fillStyle = "rgba(0,0,0,1.0)";
+	ctx.fillStyle = bgColor;
 	ctx.fillRect(0,0,canvas.width, canvas.height);
-	const ellipseWidthPct = 0.03;
-	const ellipseWidth = canvas.height * ellipseWidthPct;
-	const ellipseHalf = ellipseWidth / 2;
+
 	const verticalPadding = canvas.height * verticalPaddingPct;
 	const ellipseHeight = verticalPadding / 6;
 	const textHeight = verticalPadding * 0.4;
@@ -195,9 +197,49 @@ function draw() {
 		ctx.fillText(String.fromCharCode(65 + i), jarCenterX - (textHeight * 0.3), jarBottomY + (verticalPadding * 0.8));
 		// do DOM updates for volume/contents
 		document.getElementById("capacity-" + (i+1)).innerHTML = jars[i].volume;
-		document.getElementById("contents-" + (i+1)).innerHTML = jars[i].contents;
+		document.getElementById("contents-" + (i+1)).innerHTML = Math.round(jars[i].contents * 10.0) / 10.0;
 	}
 	document.getElementById("moves-display").innerHTML = "" + gameMoves;
+}
+
+function animate() {
+	if (animTimeout != null) {
+		window.clearTimeout(animTimeout);
+	}
+	var animNeedsToContinue = false;
+	for (let i = 0; i < jars.length; i++) {
+		if ("endContents" in jars[i] && jars[i].endContents != jars[i].contents) {
+			const frameDiff = (jars[i].endContents - jars[i].startContents) / animFrames;
+			jars[i].contents += frameDiff;
+			if (Math.abs(jars[i].contents - jars[i].endContents) < Math.abs(frameDiff)) {
+				jars[i].contents = jars[i].endContents;
+			} else {
+				animNeedsToContinue = true;
+			}
+		}
+	}
+	draw();
+	if (animNeedsToContinue) {
+		animTimeout = window.setTimeout(animate, 15);
+	} else {
+		animating = false;
+		if (jars[0].contents == jars[1].contents) {
+			gameOver = true;
+			if (gameMoves < games[selectedGameIndex].minMoves) {
+				openMenu(
+					"<p>Game complete.</p>" +
+					"<p>You completed the task in only " + gameMoves + " moves, faster than the known minimum of " + games[selectedGameIndex].minMoves + "!  Wow!</p>");
+			} else if (gameMoves == games[selectedGameIndex].minMoves) {
+				openMenu(
+					"<p>Game complete.</p>" +
+					"<p>You completed the task in the minimum of " + games[selectedGameIndex].minMoves + " moves.  Great job!</p>");
+			} else if (gameMoves > games[selectedGameIndex].minMoves) {
+				openMenu(
+					"<p>Game complete.</p>" +
+					"<p>It's possible to complete the task in " + games[selectedGameIndex].minMoves + " moves.  Try again!</p>");
+			}
+		}
+	}
 }
 
 function pour(fromIndex, toIndex) {
@@ -211,31 +253,17 @@ function pour(fromIndex, toIndex) {
 		return;
 	}
 	gameMoves++;
+	jars[toIndex].startContents = jars[toIndex].contents;
+	jars[fromIndex].startContents = jars[fromIndex].contents;
 	if (availableCapacity >= jars[fromIndex].contents) {
-		jars[toIndex].contents += jars[fromIndex].contents;
-		jars[fromIndex].contents = 0;
+		jars[toIndex].endContents = jars[toIndex].contents + jars[fromIndex].contents;
+		jars[fromIndex].endContents = 0;
 	} else {
-		jars[toIndex].contents += availableCapacity;
-		jars[fromIndex].contents -= availableCapacity;
+		jars[toIndex].endContents = jars[toIndex].contents + availableCapacity;
+		jars[fromIndex].endContents = jars[fromIndex].contents - availableCapacity;
 	}
-	draw();
-	if (jars[0].contents == jars[1].contents) {
-		gameOver = true;
-		if (gameMoves < games[selectedGameIndex].minMoves) {
-			document.getElementById("menu-contents").innerHTML =
-				"<p>Game complete.</p>" +
-				"<p>You completed the task in only " + gameMoves + " moves, faster than the known minimum of " + games[selectedGameIndex].minMoves + "!  Wow!</p>";
-		} else if (gameMoves == games[selectedGameIndex].minMoves) {
-			document.getElementById("menu-contents").innerHTML =
-				"<p>Game complete.</p>" +
-				"<p>You completed the task in the minimum of " + games[selectedGameIndex].minMoves + " moves.  Great job!</p>";
-		} else if (gameMoves > games[selectedGameIndex].minMoves) {
-			document.getElementById("menu-contents").innerHTML =
-				"<p>Game complete.</p>" +
-				"<p>It's possible to complete the task in " + games[selectedGameIndex].minMoves + " moves.  Try again!</p>";
-		}
-		openMenu();
-	}
+	animating = true;
+	animate();
 }
 
 function setCanvasScaleVars() {
@@ -262,7 +290,11 @@ window.addEventListener("resize", function() {
 });
 
 var mouseUpHandler = function(e) {
+	if (animating) {
+		return;
+	}
 	if (gameOver) {
+		openMenu("Use a \"Select jars\" button to reset the game.");
 		return;
 	}
 	// this might help prevent strange ios/mobile weirdness
@@ -316,7 +348,8 @@ function closeMenu() {
 	document.getElementById('menu-open-wrap').style.display = 'block';
 }
 
-function openMenu() {
+function openMenu(html) {
+	document.getElementById("menu-contents").innerHTML = html;
 	menuVisible = true;
 	closeHelpMenu();
 	document.getElementById('menu').style.display = 'block';

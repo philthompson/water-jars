@@ -166,7 +166,7 @@
         grid-row: 1;
         grid-column: 1;
         display: grid;
-        grid-template-columns: 33% 33% 33%;
+        grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 100%;
     }
     #capacity-1 {
@@ -187,6 +187,9 @@
     #jars {
         grid-row: 2;
         grid-column: 1;
+        max-width: 40rem;
+        max-height: 30rem;
+        /* margin: auto; */
     }
     #jars canvas {
         width: 100%;

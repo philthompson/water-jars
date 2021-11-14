@@ -4,7 +4,8 @@ const ctx = canvas.getContext('2d');
 var resizeTimeout = null;
 
 const bgColor = "#511993";
-const glassColor = "rgba(220,220,255,1.0)";
+const glassColor = "rgba(220,220,255,0.8)";
+const glassBottomColor = "rgba(220,220,255,0.15)";
 const waterLineColor = "rgba(120,120,255,0.7)";
 //const waterColor = "rgba(120,120,255,0.4)";
 const waterColor = "rgba(46,84,100,0.6)";
@@ -194,6 +195,13 @@ function draw() {
 		ctx.beginPath();
 		ctx.ellipse(jarCenterX, jarBottomY, jars[i].wPixels / 2, ellipseHeight, 0, 0, 2 * Math.PI);
 		ctx.stroke();
+		// fill bottom ellipse if empty
+		if (jars[i].contents == 0) {
+			ctx.fillStyle = glassBottomColor;
+			ctx.beginPath();
+			ctx.ellipse(jarCenterX, jarBottomY, jars[i].wPixels / 2, ellipseHeight, 0, 0, 2 * Math.PI);
+			ctx.fill();
+		}
 		// draw jar label
 		if (jars[i].clicked) {
 			ctx.fillStyle = selectedColor;

@@ -15,14 +15,10 @@
         font-family: sans-serif;
     }
     body, html, div { border: 0; margin: 0; padding: 0; }
-    /* use overflow: hidden to stop scrolling on mobile devices, thanks;
-         to https://stackoverflow.com/a/28411556/259456 */
-    body, html {  height: 100%; overflow: hidden; }
-    #dc { position:absolute; width: 100%; height: 100%; z-index:10; }
     #menu, #help-menu, #menu-open-wrap {
         position:fixed;
         width: 96%;
-        padding: 2%;
+        padding: 2.0rem;
         margin: 0;
         z-index: 11;
         font-size: 1.5rem;
@@ -33,7 +29,7 @@
       right: 0px;
     }
     #menu, #help-menu {
-        background-color: rgba(255,255,255,0.9);
+        background-color: rgba(255,255,255,1.0);
         display: none;
         overflow-y: auto;
     }
@@ -63,6 +59,7 @@
       margin-right: 4.0rem;
     }
     #menu-contents {
+        padding: 2.0rem;
     }
     .fixed-top-right-btn {
       position: fixed;
@@ -109,17 +106,32 @@
     }
     #grid-outer {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 4% 4% 44% 44% 4%;
+        grid-template-areas:
+            "title"
+            "right-very-top"
+            "right-mid"
+            "right-very-bottom"
+            "left-bottom"
+            "left-top";
         gap: 1.0rem;
         padding: 1.0rem;
-        max-width: 60rem;
         margin-left: auto;
         margin-right: auto;
     }
+    @media (min-width: 40rem) {
+        #grid-outer {
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                "title title"
+                ". right-very-top"
+                "left-top right-mid"
+                "left-bottom right-mid"
+                ". right-very-bottom";
+            max-width: 60rem;
+        }
+    }
     #title {
-        grid-row: 1;
-        grid-column: 1 / 3;
+        grid-area: title;
         font-size: 2.5rem;
         letter-spacing: 0.2rem;
         font-weight: bold;
@@ -128,12 +140,10 @@
         text-align: center;
     }
     #left-top {
-        grid-row:  3;
-        grid-column: 1;
+        grid-area: left-top;
     }
     #left-bottom {
-        grid-row:  4;
-        grid-column: 1;
+        grid-area: left-bottom;
         display: grid;
         grid-template-columns: 50% 50%;
         gap: 1.0rem;
@@ -147,16 +157,14 @@
         grid-column: 2;
     }
     #right-very-top {
-        grid-row: 2;
-        grid-column: 2;
+        grid-area: right-very-top;
         font-size: 1.5rem;
     }
     #right-very-top p {
         margin-bottom: 0;
     }
     #right-mid {
-        grid-row: 3 / 5;
-        grid-column: 2;
+        grid-area: right-mid;
         display: grid;
         grid-template-columns: 100%;
         grid-template-rows: 8% 84% 8%;
@@ -168,7 +176,6 @@
         grid-column: 1;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 100%;
     }
     #capacity div, #contents div {
         position: relative;
@@ -189,7 +196,6 @@
         grid-column: 1;
         max-width: 40rem;
         max-height: 30rem;
-        /* margin: auto; */
     }
     #jars canvas {
         width: 100%;
@@ -199,7 +205,7 @@
         grid-row: 3;
         grid-column: 1;
         display: grid;
-        grid-template-columns: 33% 33% 33%;
+        grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 100%;
     }
     #contents-1 {
@@ -212,8 +218,7 @@
         grid-column: 3;
     }
     #right-very-bottom {
-        grid-row: 5;
-        grid-column: 2;
+        grid-area: right-very-bottom;
         font-size: 1.5rem;
     }
     #select-jars div {

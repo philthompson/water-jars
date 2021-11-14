@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Divide and Conquer</title>
+    <style type="text/css">
+    body {
+        background-color: #333;
+        color: #111;
+        font-size: 1.2rem;
+        font-family: sans-serif;
+    }
+    body, html, div { border: 0; margin: 0; padding: 0; }
+    /* use overflow: hidden to stop scrolling on mobile devices, thanks;
+         to https://stackoverflow.com/a/28411556/259456 */
+    body, html {  height: 100%; overflow: hidden; }
+    #dc { position:absolute; width: 100%; height: 100%; z-index:10; }
+    #menu, #help-menu, #menu-open-wrap {
+        position:fixed;
+        width: 96%;
+        padding: 2%;
+        margin: 0;
+        z-index: 11;
+        color: #111;
+        font-size: 1.5rem;
+    }
+    #menu {
+      max-height: 95%;
+      width: 97%;
+      right: 0px;
+    }
+    #menu, #help-menu {
+        background-color: rgba(255,255,255,0.9);
+        display: none;
+        overflow-y: auto;
+    }
+    #menu p, #help-menu p {
+        padding-bottom: 1rem;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    button {
+        font-size: 1rem;
+        cursor: pointer;
+        z-index: 12;
+    }
+    #menu-close, #help-menu-close, #menu-open-wrap span {
+        color: #aaa;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: -.7rem;
+        cursor: pointer;
+        z-index: 12;
+    }
+    #help-menu {
+      padding-left: 2.0rem;
+    }
+    #help-menu div {
+      float: left;
+      margin-right: 4.0rem;
+    }
+    #menu-contents {
+    }
+    .fixed-top-right-btn {
+      position: fixed;
+      right: 2.0rem;
+      top: 2.0rem;
+    }
+    .fixed-top-left-btn {
+      position: fixed;
+      left: 2.0rem;
+      top: 2.0rem;
+    }
+    kbd {
+        border: 2px solid #555;
+        border-radius: 0.25rem;
+        padding: 0.2rem;
+        width: 1.5rem;
+        display: inline-block;
+        height: 1.5rem;
+        text-align: center;
+        font-size: 1.3rem;
+    }
+    .rounded {
+        border-radius: 1.0rem;
+        border: 1px solid #000;
+        padding: 1.0rem;
+    }
+    .blue-bg {
+        background-color: #75d7fe;
+        color: #001a94;
+    }
+    .blue-border {
+        border: 0.4rem solid #75d7fe;
+    }
+    .purple-bg {
+        background-color: #511993;
+    }
+    .white-bg {
+        background-color: #ffffff;
+    }
+    .white-text {
+        color: #FFF;
+    }
+    #grid-outer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 4% 4% 44% 44% 4%;
+        gap: 1.0rem;
+        padding: 1.0rem;
+        max-width: 60rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #title {
+        grid-row: 1;
+        grid-column: 1 / 3;
+        font-size: 2.5rem;
+        letter-spacing: 0.2rem;
+        font-weight: bold;
+        font-style: italic;
+        border: 4px solid #FFF;
+        text-align: center;
+    }
+    #left-top {
+        grid-row:  3;
+        grid-column: 1;
+    }
+    #left-bottom {
+        grid-row:  4;
+        grid-column: 1;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        gap: 1.0rem;
+    }
+    #select-jars {
+        grid-row: 1;
+        grid-column: 1;
+    }
+    #moves {
+        grid-row: 1;
+        grid-column: 2;
+    }
+    #right-very-top {
+        grid-row: 2;
+        grid-column: 2;
+        font-size: 1.5rem;
+    }
+    #right-very-top p {
+        margin-bottom: 0;
+    }
+    #right-mid {
+        grid-row: 3 / 5;
+        grid-column: 2;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 8% 84% 8%;
+        gap: 1.0rem;
+        font-size: 1.5rem;
+    }
+    #capacity {
+        grid-row: 1;
+        grid-column: 1;
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        grid-template-rows: 100%;
+    }
+    #capacity-1 {
+        grid-row: 1;
+        grid-column: 1;
+        text-align: center;
+    }
+    #capacity-2 {
+        grid-row: 1;
+        grid-column: 2;
+        text-align: center;
+    }
+    #capacity-3 {
+        grid-row: 1;
+        grid-column: 3;
+        text-align: center;
+    }
+    #jars {
+        grid-row: 2;
+        grid-column: 1;
+    }
+    #jars canvas {
+        width: 100%;
+        height: 100%;
+    }
+    #contents {
+        grid-row: 3;
+        grid-column: 1;
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        grid-template-rows: 100%;
+    }
+    #contents-1 {
+        grid-row: 1;
+        grid-column: 1;
+        text-align: center;
+    }
+    #contents-2 {
+        grid-row: 1;
+        grid-column: 2;
+        text-align: center;
+    }
+    #contents-3 {
+        grid-row: 1;
+        grid-column: 3;
+        text-align: center;
+    }
+    #right-very-bottom {
+        grid-row: 5;
+        grid-column: 2;
+        font-size: 1.5rem;
+    }
+    #select-jars div {
+        text-align: center;
+    }
+    #select-jars div button {
+        width: 8.0rem;
+        padding: 0.2rem;
+        margin-top: 0.3rem;
+    }
+    #moves p {
+        font-size: 2.5rem;
+        font-weight: bold;
+        font-style: italic;
+    }
+    </style>
+</head>
+<body class="purple-bg">
+    <div id="menu-open-wrap">
+        <span class="fixed-top-left-btn" id="help-menu-open"><kbd>?</kbd></span>
+    </div>
+    <div id="menu">
+        <span style="position: fixed; right: 2.0rem; top: 2.0rem;" id="menu-close">×</span>
+        <div id="menu-contents"></div>
+    </div>
+    <div id="help-menu">
+        <span style="position: fixed; right: 2.0rem; top: 2.0rem;" id="help-menu-close">×</span>
+        <p>
+            Help/info content here.
+        </p>
+    </div>
+    <div id="grid-outer">
+        <div id="title" class="rounded white-text">
+            ÷÷÷÷÷÷÷ Divide and Conquer ÷÷÷÷÷÷÷
+        </div>
+        <div id="left-top" class="rounded blue-bg">
+            <p>The problem: You have three jars of different
+            sizes. The largest one is filled with water.
+            Divide the water evenly between jars A and
+            B, in the fewest number of moves.</p>
+            <p>Pour water from one jar to another to reach
+            the goal. To pour from A to B, click on jar A
+            then click on jar B.</p>
+            <p>To measure accurately, you must either fill a
+            jar to the top, or empty out a jar.</p>
+        </div>
+        <div id="left-bottom" class="rounded blue-bg">
+            <div id="select-jars">
+                <p style="text-align: center;">Select jars</p>
+                <div id="select-jars-btns">
+                </div>
+            </div>
+            <div id="moves">
+                <p style="text-align: center;">Moves</p>
+                <p style="text-align: center;" id="moves-display">0</p>
+            </div>
+        </div>
+        <div id="right-very-top">
+            <p style="text-align: center;" class="white-text">Capacity</p>
+        </div>
+        <div id="right-mid">
+            <div id="capacity" class="rounded white-bg blue-border">
+                <div id="capacity-1">1</div>
+                <div id="capacity-2">2</div>
+                <div id="capacity-3">3</div>
+            </div>
+            <div id="jars">
+                <canvas id="c"></canvas>
+            </div>
+            <div id="contents" class="rounded white-bg blue-border">
+                <div id="contents-1">1</div>
+                <div id="contents-2">2</div>
+                <div id="contents-3">3</div>
+            </div>
+        </div>
+        <div id="right-very-bottom">
+            <p style="text-align: center;" class="white-text">Contents</p>
+        </div>
+    </div>
+    <script src="waterJar.js"></script>
+</body>
+</html>

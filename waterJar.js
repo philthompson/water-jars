@@ -238,7 +238,7 @@ function animate() {
 		animTimeout = window.setTimeout(animate, 15);
 	} else {
 		animating = false;
-		if (jars[0].contents == jars[1].contents) {
+		if (jars[0].contents == jars[1].contents && jars[2].contents == 0) {
 			gameOver = true;
 			if (gameMoves < games[selectedGameIndex].minMoves) {
 				openMenu(

@@ -234,6 +234,15 @@
         font-weight: bold;
         font-style: italic;
     }
+    details {
+        padding: 3.0rem;
+    }
+    #game-log summary {
+        cursor: pointer;
+    }
+    #game-log th, #game-log td {
+        text-align: center;
+    }
     </style>
 </head>
 <body class="purple-bg">
@@ -250,7 +259,7 @@
             Help/info content here.
         </p>
     </div>
-    <div id="grid-outer">
+    <div id="grid-outer" class="purple-bg">
         <div id="title" class="rounded white-text">
             ÷÷÷÷÷÷÷ Divide and Conquer ÷÷÷÷÷÷÷
         </div>
@@ -298,6 +307,9 @@
             <p style="text-align: center;" class="white-text">Contents</p>
         </div>
     </div>
+    <details id="game-log" class="white-text purple-bg">
+        <summary>Game Log</summary>
+    </details>
     <script src="waterJar.js"></script>
 </body>
 </html>

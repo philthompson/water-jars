@@ -32,6 +32,8 @@ const games = [
 var selectedGameIndex = 0;
 var gameOver = false;
 var gameMoves = 0;
+var gameLog = [];
+var gameStartMs = 0;
 
 var buttonsHtml = [];
 for (let i = 0; i < games.length; i++) {
@@ -72,6 +74,7 @@ var resetJars = function(jarVolumes) {
 	closeHelpMenu();
 	gameOver = false;
 	gameMoves = 0;
+	gameLog = [];
 	// delete any previous jars
 	jars.length = 0;
 	var largestJarVolume = 0;
@@ -85,6 +88,8 @@ var resetJars = function(jarVolumes) {
 		jars[i].clicked = false;
 	}
 	jars[largestJarIndex].contents = largestJarVolume;
+	// wait for first move to start the clock
+	gameStartMs = 0;
 }
 
 var resizeJars = function() {
@@ -239,7 +244,19 @@ function animate() {
 	} else {
 		animating = false;
 		if (jars[0].contents == jars[1].contents && jars[2].contents == 0) {
+			const gameDurationMs = Date.now() - gameStartMs;
+			const gameDurationMin = Math.trunc(gameDurationMs / (1000 * 60));
+			const gameDurationSec = Math.trunc((gameDurationMs % (1000 * 60)) / 1000);
 			gameOver = true;
+			const gameName = games[selectedGameIndex].id;
+			const minMoves = games[selectedGameIndex].minMoves;
+			var tableHtml =
+				"<br/><table>" +
+				"<tr><td colspan='3'>Game=[" + gameName + "], duration [" + gameDurationMin + "m " + gameDurationSec + "s]<br/>moves=[" + gameMoves + "], minMoves=[" + minMoves + "]</td></tr>" +
+				"<tr><th></th><th>Move</th><th>Contents</th></tr>" +
+				gameLog.join("\n") +
+				"</table>";
+			document.getElementById("game-log").innerHTML += tableHtml;
 			if (gameMoves < games[selectedGameIndex].minMoves) {
 				openMenu(
 					"<p>Game complete.</p>" +
@@ -267,7 +284,15 @@ function pour(fromIndex, toIndex) {
 		draw();
 		return;
 	}
+	if (gameStartMs == 0) {
+		gameStartMs = Date.now();
+	}
 	gameMoves++;
+	// set contents of all jars from last move
+	const contents = [];
+	for (let i = 0; i < jars.length; i++) {
+		contents.push(jars[i].contents);
+	}
 	jars[toIndex].startContents = jars[toIndex].contents;
 	jars[fromIndex].startContents = jars[fromIndex].contents;
 	if (availableCapacity >= jars[fromIndex].contents) {
@@ -277,6 +302,10 @@ function pour(fromIndex, toIndex) {
 		jars[toIndex].endContents = jars[toIndex].contents + availableCapacity;
 		jars[fromIndex].endContents = jars[fromIndex].contents - availableCapacity;
 	}
+	// overwrite contents of jars that are changing
+	contents[fromIndex] = jars[fromIndex].endContents;
+	contents[toIndex] = jars[toIndex].endContents;
+	gameLog.push("<tr><td>" + (gameLog.length + 1) + ".</td><td>" + "LMS".charAt(fromIndex) + " -> " + "LMS".charAt(toIndex) + "</td><td>" + contents.join("-") + "</td></tr>");
 	animating = true;
 	animate();
 }

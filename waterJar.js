@@ -25,9 +25,9 @@ var animating = false;
 const games = [
 	{"id": "6-4-1", "minMoves": 3},
 	{"id": "8-5-3", "minMoves": 7},
-	{"id": "12-7-4", "minMoves": 1},
-	{"id": "14-9-5", "minMoves": 1},
-	{"id": "16-10-3", "minMoves": 1}
+	{"id": "12-7-4", "minMoves": 7},
+	{"id": "14-9-5", "minMoves": 13},
+	{"id": "16-10-3", "minMoves": 11}
 ];
 var selectedGameIndex = 0;
 var gameOver = false;
